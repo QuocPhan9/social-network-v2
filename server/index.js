@@ -3,6 +3,8 @@ import dotenv from "dotenv";
 import cors from "cors";
 import fileUpload from "express-fileupload";
 import mongoose from "mongoose";
+import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
+import router from "./routes/routes.js";
 
 //Creates an Express app - server
 const app = express();
@@ -18,6 +20,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
 //Helps to upload files
 app.use(fileUpload());
+
+app.use("/api", router);
+
+app.use(notFound);
+app.use(errorHandler);
 
 //Run server in port 5000 and connect to DB
 mongoose
