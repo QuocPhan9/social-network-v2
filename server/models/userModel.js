@@ -2,7 +2,7 @@ import { Schema, model } from "mongoose";
 
 const userSchema = new Schema(
     {
-        fullname: {
+        fullName: {
             type: String,
             required: true,
         },
@@ -22,18 +22,30 @@ const userSchema = new Schema(
             type: String,
             default: "No bio yet",
         },
-        followers: {
-            type: Schema.Types.ObjectId,
-            ref: "User",
-        },
-        following: {
-            type: Schema.Types.ObjectId,
-            ref: "User",
-        },
-        bookmarks: {
-            type: Schema.Types.ObjectId,
-            ref: "User",
-        },
+        followers: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "User",
+            },
+        ],
+        following: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "User",
+            },
+        ],
+        bookmarks: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "Post",
+            },
+        ],
+        posts: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "Post",
+            },
+        ],
     },
     { timestamps: true },
 );

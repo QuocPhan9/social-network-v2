@@ -1,9 +1,46 @@
 import HttpError from "../models/errorModel.js";
-
+import UserModel from "../models/userModel.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 //===== Regisiter User =====//
 const registerUser = async (req, res, next) => {
     try {
-        res.json("Register User");
+        const { fullName, email, password, confirmPassword } = req.body;
+        if (!fullName || !email || !password || !confirmPassword) {
+            return next(new HttpError("Please fill all fields", 422));
+        }
+
+        //make the email lowercased
+        const lowerCasedEmail = email.toLowerCase();
+
+        //Check DB if email already exists
+        const emailExists = await UserModel.findOne({ email: lowerCasedEmail });
+        if (emailExists) {
+            return next(new HttpError("Email already exists", 422));
+        }
+
+        //Check if password and confirm password are same
+        if (password !== confirmPassword) {
+            return next(new HttpError("Passwords are not match"), 422);
+        }
+
+        //Check password legnth
+        if (password < 6) {
+            return next(new HttpError("Password must be at least 6 characters", 422));
+        }
+
+        //hash password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        //add user to DB
+        const newUser = await UserModel.create({
+            fullName,
+            email: lowerCasedEmail,
+            password: hashedPassword,
+        });
+
+        res.status(201).json(newUser);
     } catch (error) {
         return next(new HttpError(error));
     }
@@ -12,7 +49,37 @@ const registerUser = async (req, res, next) => {
 //===== Login User =====//
 const loginUser = async (req, res, next) => {
     try {
-        res.json("Login User");
+        const { email, password } = req.body;
+        if (!email || !password) {
+            return next(new HttpError("Please fill all fields", 422));
+        }
+
+        //make the email lowercased
+        const lowerCasedEmail = email.toLowerCase();
+
+        //fetch user from DB
+        const user = await UserModel.findOne({ email: lowerCasedEmail });
+        if (!user) {
+            return next(new HttpError("User not found", 422));
+        }
+
+        //copmare passwords
+        const isComparePassword = await bcrypt.compare(password, user?.password);
+        if (!isComparePassword) {
+            return next(new HttpError("Invalid Credential", 422));
+        }
+
+        const token = jwt.sign(
+            {
+                id: user?._id,
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "1h",
+            },
+        );
+
+        res.status(200).json({ token, id: user?._id });
     } catch (error) {
         return next(new HttpError(error));
     }
@@ -21,7 +88,13 @@ const loginUser = async (req, res, next) => {
 //===== Get User =====//
 const getUser = async (req, res, next) => {
     try {
-        res.json("Get User");
+        const { id } = req.params;
+        const user = await UserModel.findById(id);
+        if (!user) {
+            return next(new HttpError("User not found", 404));
+        }
+
+        res.status(201).json(user);
     } catch (error) {
         return next(new HttpError(error));
     }
@@ -30,7 +103,9 @@ const getUser = async (req, res, next) => {
 //===== Get Users =====//
 const getUsers = async (req, res, next) => {
     try {
-        res.json("Get User");
+        const users = await UserModel.find().limit(10).sort({ createdAt: -1 });
+
+        res.json(users);
     } catch (error) {
         return next(new HttpError(error));
     }
@@ -39,7 +114,17 @@ const getUsers = async (req, res, next) => {
 //===== Edit User =====//
 const editUser = async (req, res, next) => {
     try {
-        res.json("Edit User");
+        const { fullName, bio } = req.body;
+        const editedUser = await UserModel.findByIdAndUpdate(
+            req.user.id,
+            {
+                fullName,
+                bio,
+            },
+            { new: true },
+        );
+
+        res.status(200).json(editedUser);
     } catch (error) {
         return next(new HttpError(error));
     }
