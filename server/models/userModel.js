@@ -16,7 +16,7 @@ const userSchema = new Schema(
         },
         profilePhoto: {
             type: String,
-            default: "https://res.cloudinary.com/dasnkizyz/image/upload/v1747207501/none-profile_m2qo6t.jpg",
+            default: "https://res.cloudinary.com/dkd0o04li/image/upload/v1747382350/SOCIALMEDIA/AvatarIMG/o26xm3brvyqeupz6zz95.jpg",
         },
         bio: {
             type: String,
