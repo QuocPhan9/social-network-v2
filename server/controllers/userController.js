@@ -6,6 +6,7 @@ import UserModel from "../models/userModel.js";
 import HttpError from "../models/errorModel.js";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
 import cloudinary from "../utils/cloudinary.js";
 
 //===== Regisiter User =====//
@@ -202,52 +203,55 @@ const followUnfollowUser = async (req, res, next) => {
 };
 
 //===== Change User Profile Photo =====//
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const changeUserAvatar = async (req, res, next) => {
     try {
-        if (!req.files.avatar) {
+        if (!req.files?.avatar) {
             return next(new HttpError("Please choose an image", 422));
         }
 
         const { avatar } = req.files;
-        //check file size
         if (avatar.size > 500000) {
             return next(new HttpError("File size is too large. Should be less than 500kb", 422));
         }
 
-        let fileName = avatar.name;
-        let splittedFileName = fileName.split(".");
-        let newFileName = splittedFileName[0] + uuid() + "." + splittedFileName[splittedFileName.length - 1];
-        avatar.mv(path.join(__dirname, "..", "uploads", newFileName), async (err) => {
-            if (err) {
-                return next(new HttpError("File upload failed", 422));
+        const fileNameParts = avatar.name.split(".");
+        const newFileName = fileNameParts[0] + uuid() + "." + fileNameParts.pop();
+        const filePath = path.join(__dirname, "..", "uploads", newFileName);
+
+        avatar.mv(filePath, async (err) => {
+            if (err) return next(new HttpError("File upload failed", 422));
+
+            try {
+                const result = await cloudinary.uploader.upload(filePath, {
+                    resource_type: "image",
+                    folder: "SOCIALMEDIA/AvatarIMG",
+                });
+
+                if (!result.secure_url) {
+                    return next(new HttpError("Couldn't upload image to Cloudinary", 422));
+                }
+
+                const updatedUser = await UserModel.findByIdAndUpdate(
+                    req.user.id,
+                    { $set: { profilePhoto: result.secure_url } },
+                    { new: true },
+                );
+
+                if (!updatedUser) {
+                    return next(new HttpError("User not found or update failed", 404));
+                }
+
+                res.status(200).json({
+                    success: true,
+                    message: "User avatar changed successfully",
+                    user: updatedUser,
+                });
+            } catch (cloudErr) {
+                return next(new HttpError(cloudErr.message || "Cloudinary error", 500));
             }
-
-            //store img on cloudinary
-            const result = await cloudinary.uploader.upload(path.join(__dirname, "..", "uploads", newFileName), {
-                resource_type: "image",
-            });
-            if(!result.secure_url){
-                return next(new HttpError("Coudn't upload image to cloudinary", 422));
-            }
-
-            const updatedUser = await UserModel.findByIdAndUpdate(
-                req.user.id,
-                { avatar: result.secure_url },
-                { new: true },
-            );
-
-            res.status(200).json({
-                success: true,
-                message: "User avatar changed successfully",
-                user: updatedUser,
-            });
-
-        });
-
-        res.status(200).json({
-            success: true,
-            message: "File uploaded successfully",
-            fileName: newFileName,
         });
     } catch (error) {
         return next(new HttpError(error.message || "Something went wrong", 500));
