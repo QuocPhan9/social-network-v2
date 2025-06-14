@@ -167,7 +167,7 @@ const likeDislikePost = async (req, res, next) => {
             post: updatedPost,
         });
     } catch (error) {
-        next(new HttpError(error.message || "Something went wrong", 500));
+        return next(new HttpError(error.message || "Something went wrong", 500));
     }
 };
 
