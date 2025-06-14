@@ -47,7 +47,7 @@ const registerUser = async (req, res, next) => {
             password: hashedPassword,
         });
 
-        res.status(201).json(newUser);
+        res.status(201).json("Register Successfully",newUser);
     } catch (error) {
         return next(new HttpError(error.message || "Something went wrong", 500));
     }
@@ -86,7 +86,11 @@ const loginUser = async (req, res, next) => {
             },
         );
 
-        res.status(200).json({ token, id: user?._id });
+        res.status(200).json({ 
+            token, 
+            id: user?._id,
+            message: "Login Successfully",
+        });
     } catch (error) {
         return next(new HttpError(error.message || "Something went wrong", 500));
     }

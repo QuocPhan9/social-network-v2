@@ -24,7 +24,7 @@ import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = Router();
 
-//===== User Routes =====//
+//=============== User Routes ===============//
 
 //POST
 router.post("/users/register", registerUser);
@@ -41,22 +41,22 @@ router.get("/users/:id/follow-unfollow", authMiddleware, followUnfollowUser);
 //PATCH
 router.patch("/users/:id", authMiddleware, editUser);
 
-//===== Post Routes =====//
+//=============== Post Routes ===============//
 
 //POST
-router.post("/posts", createPost);
+router.post("/posts",authMiddleware, createPost);
 
 //GET
-router.get("/posts/:id", getPost);
-router.get("/posts", getPosts);
-router.get("/posts/:id/like", likeDislikePost);
-router.get("/posts/follwings", getFollowingPosts);
-router.get("/posts/:id/bookmark", createBookmark);
+router.get("/posts/:id", authMiddleware, getPost);
+router.get("/posts", authMiddleware, getPosts);
+router.get("/posts/:id/like", authMiddleware, likeDislikePost);
+router.get("/posts/follwing", authMiddleware, getFollowingPosts);
+router.get("/posts/:id/bookmark", authMiddleware, createBookmark);
 
 //PATCH
-router.patch("/posts/:id", updatePost);
+router.patch("/posts/:id", authMiddleware, updatePost);
 
 //DELETE
-router.delete("/posts/:id", deletePost);
-
+router.delete("/posts/:id", authMiddleware, deletePost);
+ 
 export default router;
