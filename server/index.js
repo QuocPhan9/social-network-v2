@@ -5,9 +5,9 @@ import fileUpload from "express-fileupload";
 import mongoose from "mongoose";
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 import router from "./routes/routes.js";
+import { server, app } from "./socket/socket.js";
 
 //Creates an Express app - server
-const app = express();
 
 //Loads .env file into process.env
 dotenv.config();
@@ -31,7 +31,7 @@ mongoose
     .connect(process.env.MONGODB_URI)
     .then(() => {
         console.log("Connected to MongoDB");
-        app.listen(process.env.PORT, () => {
+        server.listen(process.env.PORT, () => {
             console.log(`Server is running on port ${process.env.PORT}`);
         });
     })
