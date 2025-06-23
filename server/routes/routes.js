@@ -20,6 +20,17 @@ import {
     createBookmark,
     getUserBookmarks,
 } from "../controllers/postController.js";
+import {
+    createComment,
+    getPostComments,
+    deleteComment,
+} from "../controllers/commentController.js";
+import {
+    createMessage,
+    getMessages,
+    getConversations,
+} from "../controllers/messageController.js";
+
 import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = Router();
@@ -59,4 +70,25 @@ router.patch("/posts/:id", authMiddleware, updatePost);
 //DELETE
 router.delete("/posts/:id", authMiddleware, deletePost);
  
+//=============== Comment Routes ===============//
+
+//GET
+router.get("/comments/:postId", authMiddleware, getPostComments);
+
+//POST
+router.post("/comments/:postId", authMiddleware, createComment);
+
+//DELETE
+router.delete("/comments/:commentId", authMiddleware, deleteComment);
+
+//=============== Message Routes ===============//
+
+//GET
+router.get("/messages/:receiverId", authMiddleware, getMessages);
+router.get("/conversations", authMiddleware, getConversations);
+
+//POST
+router.post("/messages/:receiverId", authMiddleware, createMessage);
+
+//DELETE
 export default router;
