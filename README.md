@@ -6,7 +6,7 @@ A modern and responsive social media web application built with **ReactJS**.
 
 - **Frontend:** ReactJS, React Router, Axios, Redux Toolkit, Socket.IO
 - **UI:** Tailwind CSS, React Icons
-- **Backend:** [Your backend API here – e.g., Node.js + Express + MongoDB] *(Not included in this repo)*
+- **Backend:** Node.js + Express + MongoDB
 
 ---
 
