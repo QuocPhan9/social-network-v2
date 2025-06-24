@@ -15,9 +15,19 @@ A modern and responsive social media web application built with **ReactJS**.
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/social-media-project.git
-cd social-media-project
+git clone https://github.com/QuocPhan9/social-network-v2.git
+cd social-network-v2
+```
+
+### 2. Install dependencies
 
 ```bash
 npm install
+```
 
+### 3. Start the development server and client
+
+```bash
+cd server and client
+npm run dev
+```
