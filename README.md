@@ -17,9 +17,9 @@ A modern and responsive social media web application built with **ReactJS**.
 ### 1. Clone the repository
 
 ```bash
-choose branch develop
 git clone https://github.com/QuocPhan9/social-network-v2.git
 cd social-network-v2
+git checkout develop
 ```
 
 ### 2. Install dependencies
