@@ -22,12 +22,22 @@ cd social-network-v2
 ### 2. Install dependencies
 
 ```bash
+cd client
+npm install
+
+cd ../server
 npm install
 ```
 
 ### 3. Start the development server and client
 
 ```bash
-cd server and client
+cd client
 npm run dev
 ```
+
+```bash
+cd server
+npm run dev
+```
+
